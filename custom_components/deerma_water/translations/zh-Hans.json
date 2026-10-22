@@ -1,0 +1,38 @@
+{
+  "title": "飞利浦水健康（社区增强测试版）",
+  "config": {
+    "step": {
+      "user": {
+        "title": "登录飞利浦水健康",
+        "description": "先将设备绑定到官方 App。本集成使用云端连接。",
+        "data": {
+          "phone": "手机号（支持 +86）",
+          "login_type": "登录方式（password 密码 / captcha 短信）"
+        }
+      },
+      "credentials": {
+        "title": "完成登录",
+        "description": "输入密码或刚收到的短信验证码。不会保存密码或验证码。",
+        "data": {
+          "pin": "密码或短信验证码"
+        }
+      },
+      "device": {
+        "title": "选择要接入的设备",
+        "data": {
+          "device_id": "设备"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "连接失败，请检查网络及账号后重试。",
+      "invalid_auth": "登录失效，请重新登录。",
+      "no_devices": "账号下未找到设备。",
+      "wrong_device": "请选回原设备，不能用另一台设备替换。"
+    },
+    "abort": {
+      "already_configured": "这台设备已经添加。",
+      "reauth_successful": "重新登录成功。"
+    }
+  }
+}

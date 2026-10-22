@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+.storage/
+*.har
+*diagnostic*.json
+*_idle.json
+*_ice_*.json
+secrets.yaml
+config_entries.json
+.env

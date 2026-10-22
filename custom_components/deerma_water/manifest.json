@@ -1,0 +1,14 @@
+{
+  "domain": "deerma_water",
+  "name": "飞利浦水健康（社区增强测试版）",
+  "codeowners": [
+    "@wanghaoran1016-commits"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/wanghaoran1016-commits/philips-water-ha",
+  "iot_class": "cloud_push",
+  "requirements": [],
+  "version": "0.2.0b8",
+  "integration_type": "device",
+  "issue_tracker": "https://github.com/wanghaoran1016-commits/philips-water-ha/issues"
+}
