@@ -1,3 +1,9 @@
+## 0.2.0b9
+
+- 登录和重新认证支持重新发送短信（60秒间隔）、返回修改手机号/登录方式、取消登录。
+- 无需填写验证码即可返回或重发，取消不会删除原设备。
+- 服务端接受发送请求并不保证短信送达；失败时保留重试入口。
+
 > 历史联调记录；当前功能和验证状态以 README.md 与 VALIDATION.md 为准。
 
 ## 0.2.0b8
@@ -47,3 +53,4 @@
 - Drop raw payload/credential logging and personal-looking upstream sample strings.
 - MIT attribution, installation, rollback, i2 Pro investigation and publishing documentation.
 - No ice-control or auto-dispense implementation. Pending real device and live cloud testing.
+
