@@ -12,9 +12,10 @@
       },
       "credentials": {
         "title": "完成登录",
-        "description": "输入密码或刚收到的短信验证码。不会保存密码或验证码。",
+        "description": "输入密码或短信验证码。收不到短信时，可留空验证码，选择“重新发送短信验证码”后提交（发送间隔至少60秒）；也可返回或取消。不会保存密码或验证码。",
         "data": {
-          "pin": "密码或短信验证码"
+          "pin": "密码或短信验证码",
+          "action": "操作（选择后点击提交）"
         }
       },
       "device": {
@@ -28,11 +29,15 @@
       "cannot_connect": "连接失败，请检查网络及账号后重试。",
       "invalid_auth": "登录失效，请重新登录。",
       "no_devices": "账号下未找到设备。",
-      "wrong_device": "请选回原设备，不能用另一台设备替换。"
+      "wrong_device": "请选回原设备，不能用另一台设备替换。",
+      "sms_cooldown": "短信发送间隔至少60秒，请稍后选择重新发送。",
+      "sms_send_failed": "验证码发送失败，请稍后重试，或返回切换密码登录。",
+      "pin_required": "请输入密码或短信验证码。"
     },
     "abort": {
       "already_configured": "这台设备已经添加。",
-      "reauth_successful": "重新登录成功。"
+      "reauth_successful": "重新登录成功。",
+      "user_cancelled": "已取消本次登录，原设备配置保留。"
     }
   }
 }
