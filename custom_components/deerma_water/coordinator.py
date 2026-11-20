@@ -8,7 +8,7 @@ import logging
 from .api_client import DeermaAPIClient, APIError, AuthError
 from .mqtt_client import ShadowClient
 from .trace import ControlTrace
-from .protocol import enum_mapping, packet, mqtt_string, has_i2pro_fields
+from .protocol import enum_mapping, packet, mqtt_string, has_i2pro_fields, accepted_confirm_values
 from .const import DOMAIN
 
 class DeermaCoordinator(DataUpdateCoordinator):
@@ -72,9 +72,10 @@ class DeermaCoordinator(DataUpdateCoordinator):
         if label not in mapping: raise HomeAssistantError('该型号未提供此选项映射，未发送指令')
         if not self.live: raise HomeAssistantError('设备状态未同步，未发送指令')
         value = mapping[label]
-        if self.reported.get(field) == value: return
+        accepted = accepted_confirm_values(field, value, label, self.reported)
+        if self.reported.get(field) is not None and str(self.reported.get(field)) in accepted: return
         try:
-            await self.shadow.set_value(field, value)
+            await self.shadow.set_value(field, value, accepted=accepted)
         except (ConnectionError, RuntimeError, TimeoutError, ValueError):
             raise HomeAssistantError('未收到设备状态确认，请检查官方 App；指令可能已生效') from None
 
