@@ -3,7 +3,7 @@ from homeassistant.core import callback
 from homeassistant.components.select import SelectEntity
 from .const import DOMAIN
 from .entity import DeermaEntity
-from .protocol import enum_mapping, has_i2pro_fields, I2PRO_COOLING_MODES, i2pro_cooling_mode, I2PRO_PRESETS, i2pro_preset_value
+from .protocol import enum_mapping, has_i2pro_fields, I2PRO_COOLING_MODES, i2pro_cooling_mode, I2PRO_PRESETS, i2pro_preset_value, match_reported_option
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
@@ -33,12 +33,11 @@ class DeermaSelect(DeermaEntity, SelectEntity):
         self.mapping = enum_mapping(coordinator.device, field)
         self._attr_options = list(self.mapping)
         self._attr_name = name
+        self._attr_icon = 'mdi:thermometer-water' if field == 'SetTemp' else ('mdi:cup-water' if field == 'SetOutlet' else None)
 
     @property
     def current_option(self):
-        value = self.coordinator.reported.get(self.field)
-        if value is None: return None
-        return next((label for label, code in self.mapping.items() if str(code) == str(value)), None)
+        return match_reported_option(self.field, self.coordinator.reported.get(self.field), self.mapping, self.coordinator.reported)
 
     async def async_select_option(self, option):
         await self.coordinator.set_option(self.field, option)

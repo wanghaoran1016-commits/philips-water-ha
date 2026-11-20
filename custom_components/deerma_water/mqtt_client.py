@@ -110,14 +110,23 @@ class ShadowClient:
                     state = shadow_state.get('reported')
                     if isinstance(state, dict):
                         self.on_state(state)
-                        for (field, value), future in list(self.pending.items()):
-                            if field in state and str(state[field]) == str(value) and not future.done(): future.set_result(None)
+                        for (field, expected), future in list(self.pending.items()):
+                            if field not in state or future.done():
+                                continue
+                            matched = (
+                                str(state[field]) in expected
+                                if isinstance(expected, frozenset)
+                                else str(state[field]) == str(expected)
+                            )
+                            if matched:
+                                future.set_result(None)
 
-    async def set_value(self, field, value):
+    async def set_value(self, field, value, accepted=None):
         if not self.connected or not self.ws: raise ConnectionError('MQTT unavailable')
         if self.pending: raise RuntimeError('Wait for the previous command')
         payload = desired_payload(field, value, self.identifier)
-        key = (field, value)
+        expected = frozenset(str(x) for x in accepted) if accepted else frozenset({str(value)})
+        key = (field, expected)
         future = asyncio.get_running_loop().create_future()
         self.pending[key] = future
         try:

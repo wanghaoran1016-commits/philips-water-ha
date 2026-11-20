@@ -155,3 +155,65 @@ def i2pro_desired_payload(values, identifier):
     else:
         raise ValueError("Unverified command")
     return {"state": {"desired": {**values, "CommandType": "app", "EnduserId": identifier}}}
+
+
+_CUBEUV_LABEL_RE = re.compile(r"^([0-9]{1,4})\s*(?:℃|°C|mL|ml)$")
+_AMBIENT_LABELS = frozenset({"常温", "normal", "ambient"})
+
+
+def is_cubeuv(device):
+    """Identify Philips CubeUV series devices such as ADD6862."""
+    if not isinstance(device, dict):
+        return False
+    product = device.get("product")
+    if not isinstance(product, dict):
+        return False
+    return product.get("seriesName") == "CubeUV" or product.get("modelName") == "ADD6862"
+
+
+def label_numeric_targets(field, label, reported=None):
+    """Map an option display label to possible numeric hardware reported values."""
+    targets = set()
+    text = str(label).strip()
+    m = _CUBEUV_LABEL_RE.fullmatch(text)
+    if m:
+        num = int(m.group(1))
+        targets.add(num)
+        if field == "SetTemp" and num >= 98 and isinstance(reported, dict) and type(reported.get("BoilingPoint")) is int:
+            targets.add(reported["BoilingPoint"])
+    elif field == "SetTemp" and text.lower() in _AMBIENT_LABELS:
+        if isinstance(reported, dict) and type(reported.get("InputTemp")) is int:
+            targets.add(reported["InputTemp"])
+    return targets
+
+
+def match_reported_option(field, value, mapping, reported=None):
+    """Match either enum code or numeric hardware telemetry back to the option label."""
+    if value is None or not mapping:
+        return None
+    for label, code in mapping.items():
+        if str(code) == str(value):
+            return label
+    if not isinstance(value, bool) and (
+        type(value) is int or (isinstance(value, float) and math.isfinite(value) and value.is_integer())
+    ):
+        num = int(value)
+        for label in mapping:
+            if _CUBEUV_LABEL_RE.fullmatch(str(label).strip()) and num in label_numeric_targets(field, label, reported):
+                return label
+        if field == "SetTemp":
+            for label in mapping:
+                if str(label).strip().lower() in _AMBIENT_LABELS and (
+                    num in label_numeric_targets(field, label, reported) or 0 <= num <= 30
+                ):
+                    return label
+    return None
+
+
+def accepted_confirm_values(field, code, label, reported=None):
+    """Return allowed reported shadow values confirming a SetTemp/SetOutlet command."""
+    accepted = {str(code)}
+    accepted.update(str(v) for v in label_numeric_targets(field, label, reported))
+    if field == "SetTemp" and str(label).strip().lower() in _AMBIENT_LABELS:
+        accepted.update({"20", "25"})
+    return frozenset(accepted)
